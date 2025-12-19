@@ -61,9 +61,13 @@ export class UrlService {
   }
 
   async getStats(shortCode: string) {
-    return this.urlRepository.findOne({
+    const stats = await this.urlRepository.findOne({
       where: { shortCode },
     });
+    if (!stats) {
+      throw new NotFoundException('URL not found');
+    }
+    return stats;
   }
 
   async deleteUrl(shortCode: string) {
