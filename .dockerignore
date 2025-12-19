@@ -1,0 +1,86 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+dist
+build
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings
+.history
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Testing
+coverage
+.nyc_output
+.jest
+*.test.ts
+*.spec.ts
+test
+tests
+__tests__
+
+# Documentation
+README.md
+*.md
+docs
+LICENSE
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+Jenkinsfile
+
+# Linting & Formatting
+.eslintrc*
+.prettierrc*
+.editorconfig
+biome.json
+.lintstagedrc*
+
+# Misc
+.cache
+tmp
+temp
+*.tmp
