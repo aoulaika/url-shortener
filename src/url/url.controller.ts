@@ -32,10 +32,8 @@ export class UrlController {
     description: 'The URL has been successfully shortened.',
     schema: {
       example: {
-        shortUrl: 'a1B2c31',
+        shortUrl: 'http://localhost:3000/a1B2c31',
         longUrl: 'https://www.example.com/some/long/url',
-        shortCode: 'a1B2c31',
-        createdAt: '2024-06-15T12:34:56.789Z',
       },
     },
   })
@@ -53,13 +51,7 @@ export class UrlController {
     },
   })
   async createShortUrl(@Body() createUrlDto: CreateUrlDto) {
-    const url = await this.urlService.createShortUrl(createUrlDto);
-    return {
-      shortUrl: `${url.shortCode}`,
-      longUrl: url.longUrl,
-      shortCode: url.shortCode,
-      createdAt: url.createdAt,
-    };
+    return this.urlService.createShortUrl(createUrlDto);
   }
 
   @Get(':shortCode')
@@ -78,6 +70,7 @@ export class UrlController {
     schema: {
       example: {
         shortCode: 'a1B2c31',
+        shortUrl: 'http://localhost:3000/a1B2c31',
         longUrl: 'https://www.example.com/some/long/url',
         clicks: 42,
         createdAt: '2024-06-15T12:34:56.789Z',

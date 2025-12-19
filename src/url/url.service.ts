@@ -11,6 +11,10 @@ import { UrlShortenerService } from './url-shortener.service';
 
 @Injectable()
 export class UrlService {
+  private readonly baseUrl = (
+    process.env.BASE_URL || 'http://localhost:3000'
+  ).replace(/\/$/, '');
+
   constructor(
     @InjectRepository(Url)
     private urlRepository: Repository<Url>,
@@ -36,7 +40,10 @@ export class UrlService {
       savedUrl.shortCode = shortCode;
       await manager.save(Url, savedUrl);
 
-      return savedUrl;
+      return {
+        longUrl: savedUrl.longUrl,
+        shortUrl: `${this.baseUrl}/${savedUrl.shortCode}`,
+      };
     });
   }
 
@@ -67,7 +74,13 @@ export class UrlService {
     if (!stats) {
       throw new NotFoundException('URL not found');
     }
-    return stats;
+    return {
+      shortCode: stats.shortCode,
+      shortUrl: `${this.baseUrl}/${stats.shortCode}`,
+      longUrl: stats.longUrl,
+      clicks: stats.clicks,
+      createdAt: stats.createdAt,
+    };
   }
 
   async deleteUrl(shortCode: string) {
