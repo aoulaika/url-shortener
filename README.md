@@ -5,8 +5,12 @@ $ pnpm install
 ```
 
 ## Compile and run the project
+```bash
+cp .env.example .env
+```
 
 ```bash
+
 # development
 $ pnpm run start
 
