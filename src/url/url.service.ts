@@ -9,6 +9,9 @@ import type { CreateUrlDto } from './dto/create-url.dto';
 import { Url } from './entities/url.entity';
 import { UrlShortenerService } from './url-shortener.service';
 
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
+const cacheKey = (shortCode: string) => `url_${shortCode}`;
+
 @Injectable()
 export class UrlService {
   private readonly baseUrl = (
@@ -21,9 +24,8 @@ export class UrlService {
     private urlShortenerService: UrlShortenerService,
   ) {}
 
-  async createShortUrl(createUrlDto: CreateUrlDto) {
+  async createShortUrl({ longUrl }: CreateUrlDto) {
     return this.urlRepository.manager.transaction(async (manager) => {
-      const { longUrl } = createUrlDto;
       const urlExists = await manager.exists(Url, {
         where: { longUrl },
       });
@@ -37,12 +39,11 @@ export class UrlService {
         savedUrl.id,
       );
 
-      savedUrl.shortCode = shortCode;
-      await manager.save(Url, savedUrl);
+      await manager.save(Url, { id: savedUrl.id, shortCode });
 
       return {
-        longUrl: savedUrl.longUrl,
-        shortUrl: `${this.baseUrl}/${savedUrl.shortCode}`,
+        longUrl,
+        shortUrl: `${this.baseUrl}/${shortCode}`,
       };
     });
   }
@@ -53,8 +54,8 @@ export class UrlService {
         select: { id: true, longUrl: true },
         where: { shortCode },
         cache: {
-          id: `url_longUrl_${shortCode}`,
-          milliseconds: 24 * 60 * 60 * 1000, // 24 hours
+          id: cacheKey(shortCode),
+          milliseconds: CACHE_TTL,
         },
       });
 
@@ -74,6 +75,7 @@ export class UrlService {
     if (!stats) {
       throw new NotFoundException('URL not found');
     }
+
     return {
       shortCode: stats.shortCode,
       shortUrl: `${this.baseUrl}/${stats.shortCode}`,
@@ -84,6 +86,9 @@ export class UrlService {
   }
 
   async deleteUrl(shortCode: string) {
-    await this.urlRepository.delete({ shortCode });
+    await this.urlRepository.manager.transaction(async (manager) => {
+      await manager.delete(Url, { shortCode });
+      await manager.connection.queryResultCache?.remove([cacheKey(shortCode)]);
+    });
   }
 }

@@ -11,8 +11,10 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiParam,
   ApiPermanentRedirectResponse,
@@ -37,6 +39,9 @@ export class UrlController {
       },
     },
   })
+  @ApiConflictResponse({
+    description: 'The provided long URL already exists.',
+  })
   @ApiBody({
     type: CreateUrlDto,
     examples: {
@@ -58,6 +63,9 @@ export class UrlController {
   @ApiPermanentRedirectResponse({
     description: 'Redirects to the original long URL.',
   })
+  @ApiNotFoundResponse({
+    description: 'The short URL does not exist.',
+  })
   @ApiParam({ name: 'shortCode', type: 'string', example: 'a1B2c31' })
   async redirect(@Param('shortCode') shortCode: string, @Res() res: Response) {
     const longUrl = await this.urlService.getLongUrl(shortCode);
@@ -76,6 +84,9 @@ export class UrlController {
         createdAt: '2024-06-15T12:34:56.789Z',
       },
     },
+  })
+  @ApiNotFoundResponse({
+    description: 'The short URL does not exist.',
   })
   @ApiParam({ name: 'shortCode', type: 'string', example: 'a1B2c31' })
   async getStats(@Param('shortCode') shortCode: string) {
